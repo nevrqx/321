@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>11/22/63 - Mobile Experience</title>
+    
+    <!-- Шрифты -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Manrope:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-dark: #0f0f11;
+            --bg-card: rgba(30, 30, 35, 0.7);
+            --text-main: #ececec;
+            --text-muted: #9e9e9e;
+            --accent: #e0aa3e; /* Винтажное золото */
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --font-head: 'Cormorant Garamond', serif;
+            --font-body: 'Manrope', sans-serif;
+            --padding-mobile: 24px;
+        }
+
+        /* Плавность всего */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at top right, #1f1f25 0%, transparent 40%);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            line-height: 1.75;
+            font-size: 17px;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Индикатор прокрутки */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            z-index: 1001;
+            background: transparent;
+        }
+
+        .progress-bar {
+            height: 3px;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.1s;
+        }
+
+        /* Навигация (Стеклянная) */
+        nav {
+            position: fixed;
+            bottom: 20px; /* Навигация снизу удобнее для пальца */
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(20, 20, 22, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 1px solid var(--glass-border);
+            z-index: 1000;
+            display: flex;
+            gap: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease;
+        }
+
+        nav.hidden {
+            transform: translate(-50%, 150%); /* Скрывать при скролле вниз */
+        }
+
+        nav a {
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0.7;
+            transition: opacity 0.3s, color 0.3s;
+        }
+
+        nav a.active, nav a:hover {
+            opacity: 1;
+            color: var(--accent);
+        }
+
+        /* Контейнер */
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 40px var(--padding-mobile) 120px; /* Большой отступ снизу для навбара */
+        }
+
+        /* Типографика */
+        h1, h2 {
+            font-family: var(--font-head);
+            line-height: 1.2;
+            margin-bottom: 25px;
+        }
+
+        h2 {
+            font-size: 28px;
+            color: var(--accent);
+            margin-top: 60px;
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Декоративная линия под заголовком */
+        h2::after {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 2px;
+            background: var(--accent);
+            margin-top: 10px;
+            opacity: 0.6;
+        }
+
+        p {
+            margin-bottom: 24px;
+            color: #ccc;
+            font-weight: 300;
+            text-align: left; /* Для мобильных лучше left, чем justify */
+        }
+
+        /* Анимация при скролле */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Карточки Глоссария */
+        .glossary-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .glossary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            padding: 20px;
+            border-radius: 16px;
+            backdrop-filter: blur(5px);
+            transition: transform 0.2s;
+        }
+
+        .glossary-card:active {
+            transform: scale(0.98); /* Эффект нажатия на тачскрине */
+        }
+
+        .term {
+            display: block;
+            font-family: var(--font-head);
+            font-size: 20px;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .def {
+            font-size: 15px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* Кнопка "Наверх" */
+        .to-top {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            background: var(--accent);
+            color: #000;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            border: none;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s;
+            z-index: 999;
+            box-shadow: 0 4px 15px rgba(224, 170, 62, 0.4);
+        }
+
+        .to-top.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Разделитель */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            margin: 50px 0;
+        }
+
+        /* Для очень маленьких экранов */
+        @media (max-width: 380px) {
+            body { font-size: 16px; }
+            h2 { font-size: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Прогресс чтения -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Навигация -->
+    <nav id="navbar">
+        <a href="#part1">Summary</a>
+        <a href="#part2">Перевод</a>
+        <a href="#part3">Глоссарий</a>
+    </nav>
+
+    <button class="to-top" onclick="window.scrollTo(0,0)">↑</button>
+
+    <div class="container">
+        
+        <!-- Header -->
+        <header style="padding: 40px 0 20px; text-align: center;" class="reveal">
+            <p style="text-align: center; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; font-size: 0.8rem; margin-bottom: 10px;">Stephen King</p>
+            <h1 style="font-size: 3rem; margin: 0; color: #fff;">11/22/63</h1>
+        </header>
+
+        <!-- Part 1 -->
+        <section id="part1">
+            <div class="reveal">
+                <h2>Part 1: Extended English Summary</h2>
+                <p style="color: var(--text-muted); font-size: 0.9em; margin-top: -20px; margin-bottom: 30px;">(642 words)</p>
+            </div>
+
+            <p class="reveal">In 2011, Jake Epping, a thirty-five-year-old divorced English teacher in Lisbon Falls, Maine, leads a quiet life teaching GED classes for extra income. His world fractures when Al Templeton, owner of Al's Diner, reveals a pantry that functions as a time portal—always delivering visitors to 11:58 a.m. on September 9, 1958. Each trip resets any previous changes, and no matter how long one stays, only two minutes elapse in the present.</p>
+            
+            <p class="reveal">Al, now ravaged by terminal lung cancer despite appearing healthy the previous day, spent four years in "the Land of Ago" tracking Lee Harvey Oswald. His plan to prevent Kennedy's assassination failed when his illness forced him back. Al begs Jake to continue the mission, believing it will stop the Vietnam War and create a better world.</p>
+
+            <p class="reveal">As a trial run, Jake accepts Al's challenge to save Harry Dunning's family. Harry, a janitor from Jake's GED class, wrote a harrowing essay about his father Frank Dunning's 1958 Halloween massacre—murdering Harry's mother, sister, and two brothers with a hammer. Assuming the identity "George Amberson," Jake purchases a car and drives to Derry, Maine, where he surveils Frank, a charming butcher hiding psychopathic violence. Jake's first attempt fails: by merely warning Frank, he triggers an even worse outcome. On his second reset, Jake kills Frank preemptively, saving most of the family. Upon returning to 2011, he discovers Harry died in Vietnam—a direct consequence of his survival. Al then commits suicide, leaving Jake his research and a desperate plea.</p>
+
+            <p class="reveal">Committed now, Jake re-enters the portal, erasing his previous actions. He resolves Al's secondary mission to prevent a hunting accident, then heads to Texas. He settles in Jodie, a friendly town near Dallas, becoming a teacher at Denholm Consolidated High School. As "George Amberson," he directs ambitious school plays, earns the trust of Principal Deke Simmons, and falls deeply in love with Sadie Dunhill, the librarian fleeing her abusive, mentally unstable ex-husband Johnny Clayton. Jake reveals his true identity and mission to Sadie; despite her shock, she agrees to help.</p>
+
+            <p class="reveal">For years, Jake monitors Oswald's every move—his defection to the Soviet Union, marriage to Marina Prusakova, and return to Dallas. Jake lives in impoverished neighborhoods to observe Oswald's violent domestic abuse and his job at the Texas School Book Depository. He witnesses Oswald's failed assassination attempt on General Edwin Walker on April 10, 1963, confirming he's the right man. Throughout, the "obdurate past" fights back—Jake suffers crippling pain, mysterious car accidents, and encounters the "Yellow Card Man," a temporal guardian raving about timelines collapsing under "Jimla," the force resisting change.</p>
+
+            <p class="reveal">On November 22, 1963, Jake positions himself at the Depository. His plan: intercept Oswald on the sixth floor before he can fire. But as he climbs the stairs, the past's resistance peaks—he's overcome by debilitating agony. Sadie arrives unexpectedly, having followed him. In the chaotic confrontation, Oswald shoots Sadie fatally before Jake kills him. Kennedy's motorcade passes safely below, but Jake's triumph is ashes. He returns through the portal to 2011, only to discover a dystopian nightmare—President George Wallace, elected after Kennedy's second term, launched a nuclear strike on Hanoi, triggering global war. Hillary Clinton presides over a devastated, authoritarian America. The "harmonization" of history proves catastrophic: saving Kennedy destroyed civilization.</p>
+
+            <p class="reveal">Jake realizes he must "reset" everything. He enters the portal one final time, erasing his five-year journey entirely. In the restored 2011, he tracks down Sadie—now 80, a celebrated "Citizen of the Century" in Jodie, with a loving family she built without him. At her anniversary celebration, Jake, now aged by his travels, asks for a final dance. They share one minute of perfect, bittersweet connection before separating forever. Jake accepts that some loves belong only to lost timelines, and that meddling with destiny demands a price heavier than any heart can bear.</p>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- Part 2 -->
+        <section id="part2">
+            <div class="reveal">
+                <h2>Часть 2: Расширенный перевод</h2>
+                <p style="color: var(--text-muted); font-size: 0.9em; margin-top: -20px; margin-bottom: 30px;">(655 слов)</p>
+            </div>
+
+            <p class="reveal">В 2011 году тридцатипятилетний разведённый учитель английского языка средней школы в Лисбон-Фоллз, штат Мэн, Джейк Эппинг ведёт тихую жизнь, преподавая в вечерней программе подготовки к эквиваленту школьного аттестата за дополнительный доход. Его мир трескается, когда Эл Темплтон, владелец закусочной Эла, раскрывает секрет кладовой, функционирующей как временной портал — всегда доставляющий путешественников в 11:58 утра 9 сентября 1958 года. Каждая поездка сбрасывает любые предыдущие изменения, и как долго бы человек ни оставался, в настоящем проходит всего две минуты.</p>
+            
+            <p class="reveal">Эл, разорванный терминальным раком лёгких, несмотря на здоровый вид накануне, провёл четыре года в «Стране Тому назад», выслеживая Ли Харви Освальда. Его план предотвратить убийство Кеннеди провалился, когда болезнь вынудила его вернуться. Эл умоляет Джейка продолжить миссию, веря, что это остановит войну во Вьетнаме и создаст лучший мир.</p>
+
+            <p class="reveal">В качестве пробной тренировки Джейк принимает вызов Эла спасти семью Гарри Даннинга. Гарри, дворник из класса Джейка, написал сокрушительное эссе о бойне 1958 года в Хэллоуин, когда его отец Фрэнк Даннинг зарубил матерью, сестру и двух братьев молотком. Принимая личность «Джорджа Амберсона», Джейк покупает автомобиль и едет в Дерри, штат Мэн, где наблюдает за Фрэнком, очаровательным мясником, скрывающим психопатическую жестокость. Первая попытка Джейка терпит неудачу: просто предупредив Фрэнка, он спускает ещё более ужасный исход. При втором сбросе Джейк убивает Фрэнка превентивно, спасая большую часть семьи. По возвращении в 2011 год он обнаруживает, что Гарри погиб во Вьетнаме — прямое следствие его спасения. Затем Эл совершает самоубийство, оставляя Джейка своими исследованиями и отчаянной мольбой.</p>
+
+            <p class="reveal">Теперь полностью вовлечённый, Джейк снова входит в портал, стирая предыдущие действия. Он решает второстепенную миссию Эла — предотвращает охотничье несчастье, затем отправляется в Техас. Он поселяется в Джоди, дружелюбном городке под Далласом, становясь учителем в Денхольмской объединённой средней школе. Как «Джордж Амберсон» он ставит амбициозные школьные спектакли, завоёвывает доверие директора Дека Симмонса и глубоко влюбляется в Сейди Данхилл, библиотекаря, бегущую от психопатичного бывшего мужа Джонни Клейтона. Джейк раскрывает Сейди свою истинную личность и миссию; несмотря на шок, она соглашается помочь.</p>
+
+            <p class="reveal">Годами Джейк отслеживает каждый шаг Освальда — его отъезд в Советский Союз, брак с Мариной Прусаковой и возвращение в Даллас. Джейк живёт в обездоленных кварталах, чтобы наблюдать за домашним насилием Освальда и его работой в учебно-книжном депозитарии Техаса. Он становится свидетелем неудавшегося покушения Освальда на генерала Эдвина Уокера 10 апреля 1963 года, подтверждая, что это тот самый человек. Постоянно «упрямое прошлое» бьёт в ответ — Джейк страдает от парализующей боли, загадочных автомобильных аварий и встречает «Жёлтокарточного человека», временного хранителя, бредящего о коллапсе временных линий под «Джимлой» — силой, сопротивляющейся изменениям.</p>
+
+            <p class="reveal">22 ноября 1963 года Джейк располагается в депозитарии. Его план — перехватить Освальда на шестом этаже до выстрела. Но поднимаясь по ступеням, сопротивление прошлого достигает пика — его одолевают парализующие мучения. Сейди неожиданно появляется, последовав за ним. В хаотичной перестрелке Освальд смертельно ранит Сейди, прежде чем Джейк убивает его. Кортеж Кеннеди благополучно проезжает внизу, но триумф Джейка — пепел. Он возвращается через портал в 2011 год, только чтобы обнаружить антиутопический кошмар — президент Джордж Уоллес, избранный после второго срока Кеннеди, нанёс ядерный удар по Ханоем, спровоцировав мировую войну. Хиллари Клинтон президентствует над опустошённой, авторитарной Америкой. «Гармонизация» истории оказывается катастрофической: спасение Кеннеди разрушило цивилизацию.</p>
+
+            <p class="reveal">Джейк понимает, что должен всё «сбросить». Он входит в портал в последний раз, полностью стирая свой пятилетний путь. В восстановленном 2011 году он выслеживает Сейди — теперь 80-летнюю, прославленную «Гражданкой века» Джоди, с любящей семьёй, которую она построила без него. На её юбилейном праздновании Джейк, постаревший от путешествий, просит последний танец. Они делят одну минуту совершенного, горько-сладкого соединения, прежде чем навсеки расстаться. Джейк принимает, что некоторые любви принадлежат только потерянным временным линиям, и что вмешательство в судьбу требует цены, слишком тяжёлой для любого сердца.</p>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- Part 3 -->
+        <section id="part3">
+            <h2 class="reveal">Часть 3: Глоссарий</h2>
+            
+            <div class="glossary-grid">
+                <!-- Глоссарий теперь в виде карточек -->
+                <div class="glossary-card reveal">
+                    <span class="term">Rabbit hole</span>
+                    <span class="def">Кроличья нора (портал во времени в закусочной)</span>
+                </div>
+                <div class="glossary-card reveal">
+                    <span class="term">Obdurate</span>
+                    <span class="def">Упрямое, непреклонное (сопротивление прошлого изменениям)</span>
+                </div>
+                <div class="glossary-card reveal">
+                    <span class="term">Yellow Card Man</span>
+                    <span class="def">Жёлтокарточный человек (таинственный страж временного портала)</span>
+                </div>
+                <div class="glossary-card reveal">
+                    <span class="term">Journeyman</span>
+                    <span class="def">Подёнщик, временный работник (так Джейк себя называет)</span>
+                </div>
+                <div class="glossary-card reveal">
+                    <span class="term">Harmonization</span>
+                    <span class="def">Гармонизация (самокорректировка временной линии)</span>
+                </div>
+                <div class="glossary-card reveal">
+                    <span class="term">Reset</span>
+                    <span class="def">Сброс (стирание изменений путём повторного входа)</span>
+                </div>
+                <div class="glossary-card reveal">
+                    <span class="term">The Butterfly Effect</span>
+                    <span class="def">Эффект бабочки (непредсказуемые последствия изменений)</span>
+                </div>
+                <div class="glossary-card reveal">
+                    <span class="term">Watering the Stones</span>
+                    <span class="def">Полив камней (фраза о бесполезности противостояния прошлому)</span>
+                </div>
+                <div class="glossary-card reveal">
+                    <span class="term">The Land of Ago</span>
+                    <span class="def">Страна «Тому назад» (обозначение прошлого)</span>
+                </div>
+                <div class="glossary-card reveal">
+                    <span class="term">String</span>
+                    <span class="def">Струна (метафора временной линии)</span>
+                </div>
+                <div class="glossary-card reveal">
+                    <span class="term">Dump</span>
+                    <span class="def">Свалка (дистопическое будущее после изменений)</span>
+                </div>
+                <div class="glossary-card reveal">
+                    <span class="term">Past is Obdurate</span>
+                    <span class="def">Прошлое упрямо (ключевая фраза романа)</span>
+                </div>
+                <div class="glossary-card reveal">
+                    <span class="term">Jimla</span>
+                    <span class="def">Джимла (сущность, препятствующая изменениям)</span>
+                </div>
+                <div class="glossary-card reveal">
+                    <span class="term">Active observer</span>
+                    <span class="def">Активный наблюдатель (роль Джейка)</span>
+                </div>
+                <div class="glossary-card reveal">
+                    <span class="term">Root beer</span>
+                    <span class="def">Корневое пиво (типичный напиток эпохи)</span>
+                </div>
+                <div class="glossary-card reveal">
+                    <span class="term">Sock hop</span>
+                    <span class="def">Школьная танцевальная вечеринка</span>
+                </div>
+                <div class="glossary-card reveal">
+                    <span class="term">Consolidated school</span>
+                    <span class="def">Объединённая школа (тип учебного заведения)</span>
+                </div>
+                <div class="glossary-card reveal">
+                    <span class="term">GED</span>
+                    <span class="def">Экзамен на эквивалент школьного аттестата</span>
+                </div>
+                <div class="glossary-card reveal">
+                    <span class="term">Citizen of the Century</span>
+                    <span class="def">Гражданин века (звание Сейди)</span>
+                </div>
+                <div class="glossary-card reveal">
+                    <span class="term">Kennedy Assassination</span>
+                    <span class="def">Убийство Кеннеди (центральное историческое событие)</span>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- JavaScript для анимаций -->
+    <script>
+        // Анимация появления при скролле
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    // observer.unobserve(entry.target); // Убрать комментарий, если хотим анимацию только 1 раз
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Прогресс бар и скрытие навбара
+        let lastScroll = 0;
+        const navbar = document.getElementById('navbar');
+        const toTopBtn = document.querySelector('.to-top');
+
+        window.addEventListener('scroll', () => {
+            const scrollTop = document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            
+            // Обновление линии прогресса
+            const scrolled = (scrollTop / scrollHeight) * 100;
+            document.getElementById("progressBar").style.width = scrolled + "%";
+
+            // Скрытие/показ навбара
+            if (scrollTop > lastScroll && scrollTop > 200) {
+                navbar.classList.add('hidden');
+            } else {
+                navbar.classList.remove('hidden');
+            }
+            lastScroll = scrollTop;
+
+            // Кнопка "Наверх"
+            if (scrollTop > 500) {
+                toTopBtn.classList.add('visible');
+            } else {
+                toTopBtn.classList.remove('visible');
+            }
+        });
+    </script>
+</body>
+</html>
