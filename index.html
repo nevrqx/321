@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Prep Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+
+<body>
+
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo-icon">
+                    <ion-icon name="school-outline"></ion-icon>
+                </div>
+                <span>StudySpace</span>
+            </div>
+
+            <nav class="nav-menu">
+                <button class="nav-item active" data-target="dashboard">
+                    <ion-icon name="grid-outline"></ion-icon>
+                    <span>Главная</span>
+                </button>
+                <div class="nav-divider">Языки</div>
+                <button class="nav-item" data-target="english">
+                    <ion-icon name="earth-outline"></ion-icon>
+                    <span>English</span>
+                </button>
+                <button class="nav-item" data-target="german">
+                    <ion-icon name="language-outline"></ion-icon>
+                    <span>Deutsch</span>
+                </button>
+                <div class="nav-divider">Инструменты</div>
+                <button class="nav-item" data-target="vocabulary">
+                    <ion-icon name="book-outline"></ion-icon>
+                    <span>Словарь</span>
+                </button>
+            </nav>
+            <!-- User Profile & XP -->
+            <div class="user-sidebar-bottom">
+                <div class="xp-container">
+                    <div class="xp-info">
+                        <span class="level" id="user-level-label">Уровень 1</span>
+                        <div class="xp-ratio-group">
+                            <span class="xp-ratio" id="user-xp-ratio">0 / 100 XP</span>
+                            <button id="xp-info-btn" title="Как получить XP?">
+                                <ion-icon name="information-circle-outline"></ion-icon>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="xp-bar">
+                        <div class="xp-fill" id="user-xp-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div class="user-profile" id="user-profile-trigger">
+                    <div class="avatar" id="user-avatar-initial">?</div>
+                    <div class="user-info">
+                        <span class="name" id="user-display-name">Гость</span>
+                        <span class="status" id="user-status-label">Войти в профиль</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+
+            <!-- Dashboard View -->
+            <section id="dashboard" class="view-section active">
+                <header class="section-header">
+                    <h1>Добро пожаловать, Студент! 👋</h1>
+                    <p>Твой прогресс подготовки к зимней сессии</p>
+                </header>
+
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <div class="icon-box purple">
+                            <ion-icon name="time-outline"></ion-icon>
+                        </div>
+                        <h3 id="stat-hours">0</h3>
+                        <p>Мин. обучения</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon-box green">
+                            <ion-icon name="book-outline"></ion-icon>
+                        </div>
+                        <h3 id="stat-unit">---</h3>
+                        <p>Текущий уровень</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon-box orange">
+                            <ion-icon name="flame-outline"></ion-icon>
+                        </div>
+                        <div class="streak-badge">NEW</div>
+                        <h3 id="stat-streak">Еще не начата</h3>
+                        <p>Серия занятий</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-body">
+                    <div class="dashboard-main-col">
+                        <div class="premium-quiz-card">
+                            <div class="card-glow"></div>
+                            <div class="quiz-card-content">
+                                <div class="quiz-card-header">
+                                    <div class="icon-orb">
+                                        <ion-icon name="rocket"></ion-icon>
+                                    </div>
+                                    <div>
+                                        <h2>Проверка знаний</h2>
+                                        <p>Готов к тесту по лексике?</p>
+                                    </div>
+                                </div>
+
+                                <div class="quiz-controls-grid">
+                                    <div class="control-group">
+                                        <label>Язык</label>
+                                        <div class="custom-dropdown" id="lang-dropdown">
+                                            <div class="dropdown-trigger">
+                                                <span class="selected-value" data-value="en">English</span>
+                                                <ion-icon name="chevron-down-outline"></ion-icon>
+                                            </div>
+                                            <div class="dropdown-menu">
+                                                <div class="dropdown-item active" data-value="en">English</div>
+                                                <div class="dropdown-item disabled" data-value="de">Deutsch</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="control-group">
+                                        <label>Юнит</label>
+                                        <div class="custom-dropdown" id="unit-dropdown">
+                                            <div class="dropdown-trigger">
+                                                <span class="selected-value" data-value="all">Все юниты</span>
+                                                <ion-icon name="chevron-down-outline"></ion-icon>
+                                            </div>
+                                            <div class="dropdown-menu">
+                                                <div class="dropdown-item active" data-value="all">Все юниты</div>
+                                                <div class="dropdown-item" data-value="unit8">Unit 8</div>
+                                                <div class="dropdown-item" data-value="unit9">Unit 9</div>
+                                                <div class="dropdown-item" data-value="unit10">Unit 10</div>
+                                                <div class="dropdown-item" data-value="unit11">Unit 11</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button id="start-quiz-btn" class="glow-button">Начать</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- Dashboard Sidebar -->
+                    <div class="dashboard-side-col">
+                        <div class="recent-materials">
+                            <h3>Последние материалы</h3>
+                            <div class="activity-list">
+                                <div class="activity-item" onclick="switchToTab('english')">
+                                    <div class="lang-tag en">EN</div>
+                                    <div class="details">
+                                        <h4>Intro to Economics</h4>
+                                        <p>Unit 11 • Продолжить</p>
+                                    </div>
+                                    <ion-icon name="arrow-forward-outline"></ion-icon>
+                                </div>
+                                <div class="activity-item" onclick="switchToTab('german')">
+                                    <div class="lang-tag de">DE</div>
+                                    <div class="details">
+                                        <h4>Meine Familie</h4>
+                                        <p>5 новых слов</p>
+                                    </div>
+                                    <ion-icon name="arrow-forward-outline"></ion-icon>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reading Practice Section (Full Width Tier) -->
+                <div class="dashboard-reading-tasks section-container">
+                    <div class="section-subtitle">
+                        <h3>Reading Practice</h3>
+                        <p>Упражнения по текстам English Units</p>
+                    </div>
+                    <div class="reading-tasks-grid" id="dashboard-reading-grid">
+                        <!-- Dynamically populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Future Modes Grid (Full Width Tier) -->
+                <div class="future-modes-grid section-container">
+                    <div class="mode-card" data-mode="quiz">
+                        <div class="mode-icon"><ion-icon name="help-circle-outline"></ion-icon></div>
+                        <h3>Тест</h3>
+                        <p>Выбор из вариантов</p>
+                    </div>
+                    <div class="mode-card" data-mode="spelling">
+                        <div class="mode-icon"><ion-icon name="create-outline"></ion-icon></div>
+                        <h3>Правописание</h3>
+                        <p>Вводи слова вручную</p>
+                    </div>
+                    <div class="mode-card" data-mode="flashcards">
+                        <div class="mode-icon"><ion-icon name="layers-outline"></ion-icon></div>
+                        <h3>Карточки</h3>
+                        <p>Интервальное повторение</p>
+                    </div>
+                    <div class="mode-card" data-mode="marathon">
+                        <div class="mode-icon"><ion-icon name="stopwatch-outline"></ion-icon></div>
+                        <h3>Марафон</h3>
+                        <p>Игра на время</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- English View -->
+            <section id="english" class="view-section">
+                <header class="section-header">
+                    <div class="header-top">
+                        <h1>English Materials</h1>
+                        <span class="badge en">English</span>
+                    </div>
+                    <p>University Exam Topics</p>
+                </header>
+
+                <div class="content-card">
+                    <div class="card-toolbar">
+                        <div class="custom-dropdown text-selector" id="english-text-selector">
+                            <div class="dropdown-trigger">
+                                <span class="selected-value" data-value="text9A">9A: Teenage Britain</span>
+                                <ion-icon name="chevron-down-outline"></ion-icon>
+                            </div>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-item active" data-value="text9A">9A: Teenage Britain</div>
+                                <div class="dropdown-item" data-value="text9B">9B: Carol Ann Duffy</div>
+                                <div class="dropdown-item" data-value="text10A">10A: Transport in London</div>
+                                <div class="dropdown-item" data-value="text10B">10B: John McCrae</div>
+                                <div class="dropdown-item" data-value="text11">Unit 11: Sir Arthur Conan Doyle</div>
+                                <div class="dropdown-item" data-value="text12A">12A: The American Revolution</div>
+                                <div class="dropdown-item" data-value="text12B">12B: Samuel Pepys</div>
+                            </div>
+                        </div>
+                        <div class="custom-dropdown voice-selector" id="voice-selector">
+                            <div class="dropdown-trigger" title="Выбрать голос">
+                                <ion-icon name="mic-outline"></ion-icon>
+                                <span class="selected-value">System Voice</span>
+                                <ion-icon name="chevron-down-outline" class="chevron"></ion-icon>
+                            </div>
+                            <div class="dropdown-menu">
+                                <!-- JS populated -->
+                            </div>
+                        </div>
+                        <div class="reading-timer" id="reading-timer" style="display: none;">
+                            <ion-icon name="time-outline"></ion-icon>
+                            <span id="timer-display">00:00</span>
+                            <button class="timer-stop-btn" id="stop-timer-btn" title="Остановить">
+                                <ion-icon name="stop-circle-outline"></ion-icon>
+                            </button>
+                        </div>
+                        <div class="actions">
+                            <button class="action-btn" id="btn-bookmark-text" title="Сохранить"><ion-icon
+                                    name="bookmark-outline"></ion-icon></button>
+                            <button class="action-btn" id="btn-speak-text" title="Озвучить"><ion-icon
+                                    name="volume-high-outline"></ion-icon></button>
+                        </div>
+                    </div>
+
+                    <div class="split-container">
+                        <div class="text-pane original">
+                            <!-- Content injected by JS -->
+                        </div>
+                        <div class="text-pane translation">
+                            <!-- Content injected by JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- German View -->
+            <section id="german" class="view-section">
+                <header class="section-header">
+                    <div class="header-top">
+                        <h1>Deutsch Materialien</h1>
+                        <span class="badge de">Deutsch</span>
+                    </div>
+                    <p>Wintersemester Prüfungsthemen</p>
+                </header>
+
+                <div class="content-card">
+                    <div class="card-toolbar">
+                        <h3>Thema 1: Mein Studium</h3>
+                        <div class="actions">
+                            <button class="action-btn"><ion-icon name="bookmark-outline"></ion-icon></button>
+                            <button class="action-btn"><ion-icon name="volume-high-outline"></ion-icon></button>
+                        </div>
+                    </div>
+
+                    <div class="split-container">
+                        <div class="text-pane original">
+                            <p>Ich studiere Informatik an der Technischen Universität. Das Studium ist schwer, aber sehr
+                                interessant.</p>
+                            <p>In der Zukunft möchte ich als Softwareentwickler arbeiten und innovative Programme
+                                entwickeln.</p>
+                        </div>
+                        <div class="text-pane translation">
+                            <p>Я изучаю информатику в Техническом университете. Учеба трудная, но очень интересная.</p>
+                            <p>В будущем я хочу работать разработчиком программного обеспечения и создавать
+                                инновационные программы.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Vocabulary View -->
+            <section id="vocabulary" class="view-section">
+                <header class="section-header">
+                    <div class="header-split">
+                        <div>
+                            <h1>Словарь</h1>
+                            <p>Unit 8 & Другие слова</p>
+                        </div>
+                        <div class="vocab-controls">
+                            <button class="filter-chip active" data-filter="all">Все</button>
+                            <button class="filter-chip" data-filter="en">English</button>
+                            <button class="filter-chip" data-filter="de">Deutsch</button>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="vocab-list-container">
+                    <!-- Words will be injected here dynamically by script.js -->
+                </div>
+            </section>
+
+            <!-- Profile Section -->
+            <section id="profile" class="view-section">
+                <div class="section-header">
+                    <h1>Мой профиль</h1>
+                    <p>Синхронизируйте прогресс и соревнуйтесь с друзьями</p>
+                </div>
+
+                <div class="profile-grid">
+                    <!-- Auth Card (shown if not logged in) -->
+                    <div id="auth-container" class="premium-card auth-card">
+                        <div class="card-glow"></div>
+                        <div class="auth-tabs">
+                            <button class="auth-tab active" data-tab="login">Вход</button>
+                            <button class="auth-tab" data-tab="register">Регистрация</button>
+                        </div>
+
+                        <form id="login-form" class="auth-form">
+                            <div class="input-group">
+                                <label>Email</label>
+                                <div class="input-wrapper">
+                                    <input type="email" id="login-email" placeholder="example@mail.com" required>
+                                    <ion-icon name="mail-outline" class="input-icon"></ion-icon>
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label>Пароль</label>
+                                <div class="input-wrapper">
+                                    <input type="password" id="login-password" placeholder="••••••••" required>
+                                    <ion-icon name="lock-closed-outline" class="input-icon"></ion-icon>
+                                </div>
+                            </div>
+                            <button type="submit" class="glow-button wide">Войти</button>
+                        </form>
+
+                        <form id="register-form" class="auth-form hidden">
+                            <div class="input-group">
+                                <label>Уникальный логин</label>
+                                <div class="input-wrapper">
+                                    <input type="text" id="reg-username" placeholder="только латиница и цифры"
+                                        pattern="^[a-z0-9]{1,9}$"
+                                        title="До 9 символов, только маленькие английские буквы и цифры" required>
+                                    <ion-icon name="at-outline" class="input-icon"></ion-icon>
+                                </div>
+                                <small class="input-hint">Маленькие буквы и цифры, до 9 символов</small>
+                            </div>
+                            <div class="input-group">
+                                <label>Email</label>
+                                <div class="input-wrapper">
+                                    <input type="email" id="reg-email" placeholder="example@mail.com" required>
+                                    <ion-icon name="mail-outline" class="input-icon"></ion-icon>
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label>Пароль</label>
+                                <div class="input-wrapper">
+                                    <input type="password" id="reg-password" placeholder="минимум 6 символов"
+                                        minlength="6" required>
+                                    <ion-icon name="lock-closed-outline" class="input-icon"></ion-icon>
+                                </div>
+                            </div>
+                            <button type="submit" class="glow-button wide">Создать аккаунт</button>
+                        </form>
+                    </div>
+
+                    <!-- Profile Dashboard (shown if logged in) -->
+                    <div id="profile-details" class="hidden">
+                        <div class="user-stats-large">
+                            <div class="stat-main">
+                                <div class="avatar-huge" id="profile-avatar">?</div>
+                                <div class="user-id">
+                                    <h2 id="profile-username">Username</h2>
+                                    <span id="profile-email">email@example.com</span>
+                                </div>
+                            </div>
+
+                            <div class="detailed-stats-grid">
+                                <div class="detail-card">
+                                    <span class="label">Опыт (XP)</span>
+                                    <span class="value" id="profile-xp">0</span>
+                                </div>
+                                <div class="detail-card">
+                                    <span class="label">Уровень</span>
+                                    <span class="value" id="profile-level">1</span>
+                                </div>
+                                <div class="detail-card">
+                                    <span class="label">Юниты</span>
+                                    <span class="value" id="profile-units">0</span>
+                                </div>
+                                <div class="detail-card">
+                                    <span class="label">Время (мин)</span>
+                                    <span class="value" id="profile-minutes">0</span>
+                                </div>
+                            </div>
+
+                            <button id="logout-btn" class="outline-button">Выйти из аккаунта</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Quiz Modal -->
+    <div id="quiz-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <h2>Проверка знаний</h2>
+                    <div id="quiz-live-stats" class="hidden">
+                        <div class="stat-item correct">
+                            <ion-icon name="checkmark-circle-outline"></ion-icon>
+                            <span id="live-correct">0</span>
+                        </div>
+                        <div class="stat-item incorrect">
+                            <ion-icon name="close-circle-outline"></ion-icon>
+                            <span id="live-incorrect">0</span>
+                        </div>
+                        <div class="stat-item remaining">
+                            <ion-icon name="list-outline"></ion-icon>
+                            <span id="live-remaining">0</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body" id="quiz-modal-body">
+                <div id="quiz-progress-bar">
+                    <div id="quiz-progress-fill"></div>
+                </div>
+                <div id="quiz-question-container">
+                    <!-- Questions will be injected here -->
+                </div>
+            </div>
+            <div id="quiz-modal-results" class="hidden">
+                <!-- Results will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- XP Info Modal -->
+    <div id="info-modal" class="modal">
+        <div class="modal-content info-modal-content">
+            <div class="modal-header">
+                <h2>Как получить XP?</h2>
+                <button class="close-info-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <ul class="xp-rules-list">
+                    <li>
+                        <div class="rule-icon"><ion-icon name="checkmark-done"></ion-icon></div>
+                        <div class="rule-text">
+                            <strong>+10 XP</strong>
+                            <span>За каждый правильный ответ в викторине</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="rule-icon"><ion-icon name="trophy"></ion-icon></div>
+                        <div class="rule-text">
+                            <strong>+50 XP</strong>
+                            <span>За полное прохождение теста юнита</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="rule-icon"><ion-icon name="flame"></ion-icon></div>
+                        <div class="rule-text">
+                            <strong>+100 XP</strong>
+                            <span>За сохранение ежедневной серии (Streak)</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="rule-icon"><ion-icon name="eye"></ion-icon></div>
+                        <div class="rule-text">
+                            <strong>+20 XP</strong>
+                            <span>За изучение новых слов в словаре</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="words/english/unit8.js"></script>
+    <script src="words/english/unit9.js"></script>
+    <script src="words/english/unit10.js"></script>
+    <script src="words/english/unit11.js"></script>
+    <script src="text/english/9A.js"></script>
+    <script src="text/english/9B.js"></script>
+    <script src="text/english/10A.js"></script>
+    <script src="text/english/10B.js"></script>
+    <script src="text/english/11.js"></script>
+    <script src="text/english/12A.js"></script>
+    <script src="text/english/12B.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
